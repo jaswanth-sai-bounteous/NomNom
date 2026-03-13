@@ -8,7 +8,7 @@ export const getAllCategories = async (req: Request, res: Response) => {
 
     res.json({ categories });
 
-  } catch (error) {
+  } catch {
 
     res.status(500).json({
       message: "Failed to fetch categories"
@@ -35,7 +35,7 @@ export const getCategoryById = async (
 
     res.json(category);
 
-  } catch (error) {
+  } catch {
 
     res.status(500).json({
       message: "Failed to fetch category"
@@ -54,7 +54,7 @@ export const createCategory = async (req: Request, res: Response) => {
       category
     });
 
-  } catch (error) {
+  } catch {
 
     res.status(500).json({
       message: "Failed to create category"

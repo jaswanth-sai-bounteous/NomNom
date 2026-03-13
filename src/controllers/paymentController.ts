@@ -3,14 +3,23 @@ import { Request, Response } from "express";
 import stripe from "../config/stripe";
 import { AuthRequest } from "../middleware/authMiddleware";
 
+type CheckoutItemInput = {
+  name: string;
+  price: number;
+  quantity: number;
+};
+
 export const createCheckoutSession = async (req: Request, res: Response) => {
   const { user } = req as AuthRequest;
-  const { items } = req.body; // expect items: [{ name, price, quantity }]
+  const { items } = req.body as { items?: CheckoutItemInput[] };
 
   if (!user) return res.status(401).json({ message: "Unauthorized" });
+  if (!items || !Array.isArray(items) || items.length === 0) {
+    return res.status(400).json({ message: "Checkout items are required" });
+  }
 
   try {
-    const line_items = items.map((item: any) => ({
+    const line_items = items.map((item) => ({
       price_data: {
         currency: "usd",
         product_data: { name: item.name },
@@ -31,8 +40,9 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
     });
 
     res.json({ url: session.url });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Failed to create checkout session";
     console.error(error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message });
   }
 };

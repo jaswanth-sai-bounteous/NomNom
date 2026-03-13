@@ -1,7 +1,7 @@
 // src/services/stripeService.ts
 import Stripe from "stripe";
 import { db } from "../db/db";
-import { orders, orderItems } from "../db/schema";
+import { orderItems } from "../db/schema";
 import { eq } from "drizzle-orm";
 
 // Use correct Stripe API version

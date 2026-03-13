@@ -74,7 +74,11 @@ const attachItemsToOrders = async (orderRows: OrderRow[]) => {
           price: Number(item.price),
           categories: rawCategories
             .filter((category) => category.foodId === item.productId)
-            .map(({ foodId: _foodId, ...category }) => category),
+            .map((category) => ({
+              id: category.id,
+              name: category.name,
+              description: category.description,
+            })),
           },
       })),
   })).map((order) => ({

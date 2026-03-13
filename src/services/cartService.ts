@@ -44,7 +44,11 @@ const attachProductsToCartItems = async (
             price: Number(product.price),
             categories: productCategories
               .filter((category) => category.foodId === product.id)
-              .map(({ foodId: _foodId, ...category }) => category),
+              .map((category) => ({
+                id: category.id,
+                name: category.name,
+                description: category.description,
+              })),
           }
         : null,
     };
@@ -77,7 +81,7 @@ export const getCartByUserId = async (userId: string) => {
 
 /* Each user gets exactly one cart. If it does not exist yet, create it. */
 const getOrCreateCartByUserId = async (userId: string) => {
-  let cartResult = await db
+  const cartResult = await db
     .select()
     .from(carts)
     .where(eq(carts.userId, userId))

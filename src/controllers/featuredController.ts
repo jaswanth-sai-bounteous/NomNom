@@ -10,7 +10,7 @@ export const getFeaturedProducts = async (req: Request, res: Response) => {
       featured: products
     });
 
-  } catch (error) {
+  } catch {
 
     res.status(500).json({
       message: "Failed to fetch featured products"
@@ -31,7 +31,7 @@ export const addFeaturedProduct = async (req: Request, res: Response) => {
       featured
     });
 
-  } catch (error) {
+  } catch {
 
     res.status(500).json({
       message: "Failed to add featured product"

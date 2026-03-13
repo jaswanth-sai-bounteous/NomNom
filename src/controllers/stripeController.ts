@@ -18,7 +18,8 @@ export const getPayment = async (req: AuthRequest, res: Response) => {
     const payment = await stripeService.retrievePaymentIntent(paymentIntentId);
 
     res.json({ payment });
-  } catch (error: any) {
-    res.status(400).json({ message: error.message });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Failed to fetch payment";
+    res.status(400).json({ message });
   }
 };

@@ -29,7 +29,11 @@ export const getFeaturedProducts = async () => {
     ...product,
     categories: categoriesByFoodId
       .filter((category) => category.foodId === product.id)
-      .map(({ foodId: _foodId, ...category }) => category),
+      .map((category) => ({
+        id: category.id,
+        name: category.name,
+        description: category.description,
+      })),
   }));
 };
 
