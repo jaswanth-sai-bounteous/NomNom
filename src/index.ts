@@ -18,7 +18,7 @@ const app = express();
 
 const allowedOrigins = (
   process.env.FRONTEND_URLS ??
-  "http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174"
+  "http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174,https://nom-nom-frontend-psi.vercel.app"
 )
   .split(",")
   .map((origin) => origin.trim())

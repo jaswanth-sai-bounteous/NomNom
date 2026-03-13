@@ -3,10 +3,12 @@ import { Request, Response } from "express";
 import { AuthRequest } from "../types/express";
 import * as userService from "../services/userService";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const cookieOptions = {
   httpOnly: true,
-  sameSite: "lax" as const,
-  secure: process.env.NODE_ENV === "production",
+  sameSite: (isProduction ? "none" : "lax") as "none" | "lax",
+  secure: isProduction,
 };
 
 export const register = async (req: Request, res: Response) => {
