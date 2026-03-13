@@ -35,6 +35,22 @@ export const register = async (
   return newUser[0];
 };
 
+export const getUserById = async (id: string) => {
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, id)
+  });
+
+  if (!user) {
+    return null;
+  }
+
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email
+  };
+};
+
 /* ================= LOGIN ================= */
 
 export const login = async (
@@ -79,7 +95,12 @@ export const login = async (
 
   return {
     accessToken,
-    refreshToken
+    refreshToken,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email
+    }
   };
 };
 

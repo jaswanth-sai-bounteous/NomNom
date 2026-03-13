@@ -1,37 +1,36 @@
+// src/middleware/authMiddleware.ts
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-export const authMiddleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+// Extend Request to include `user`
+export interface AuthRequest extends Request {
+  user?: { id: string; email: string };
+}
 
-  const token = req.cookies.accessToken;
+interface JwtPayload {
+  userId: string;
+  email?: string;
+}
 
-  if (!token) {
-    return res.status(401).json({
-      message: "Unauthorized"
-    });
-  }
+export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  const token = (req as AuthRequest).cookies?.accessToken;
+  if (!token) return res.status(401).json({ message: "Unauthorized" });
+
+  const secret = process.env.JWT_SECRET;
+  if (!secret) throw new Error("JWT_SECRET not set");
 
   try {
+    const decoded = jwt.verify(token, secret) as JwtPayload;
 
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET as string
-    );
-
-    (req as any).user = decoded;
+    // Attach user to request safely
+    (req as AuthRequest).user = {
+      id: decoded.userId,
+      email: decoded.email ?? "",
+    };
 
     next();
-
-  } catch {
-
-    return res.status(401).json({
-      message: "Invalid or expired token"
-    });
-
+  } catch (err) {
+    console.error("JWT error:", err);
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
-
 };
