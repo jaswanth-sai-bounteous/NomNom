@@ -9,6 +9,22 @@ type CheckoutItemInput = {
   quantity: number;
 };
 
+const getClientBaseUrl = () => {
+  const rawClientUrl = process.env.CLIENT_URL?.trim();
+  if (!rawClientUrl) {
+    throw new Error("CLIENT_URL is missing. Set it in backend environment variables.");
+  }
+
+  const withScheme = /^https?:\/\//i.test(rawClientUrl)
+    ? rawClientUrl
+    : rawClientUrl.startsWith("localhost") || rawClientUrl.startsWith("127.0.0.1")
+      ? `http://${rawClientUrl}`
+      : `https://${rawClientUrl}`;
+
+  const url = new URL(withScheme);
+  return url.origin;
+};
+
 export const createCheckoutSession = async (req: Request, res: Response) => {
   const { user } = req as AuthRequest;
   const { items } = req.body as { items?: CheckoutItemInput[] };
@@ -19,6 +35,11 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
   }
 
   try {
+    const clientBaseUrl = getClientBaseUrl();
+    const successUrl = new URL("/success", clientBaseUrl);
+    successUrl.searchParams.set("session_id", "{CHECKOUT_SESSION_ID}");
+    const cancelUrl = new URL("/cancel", clientBaseUrl);
+
     const line_items = items.map((item) => ({
       price_data: {
         currency: "usd",
@@ -32,8 +53,8 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
       payment_method_types: ["card"],
       line_items,
       mode: "payment",
-      success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.CLIENT_URL}/cancel`,
+      success_url: successUrl.toString(),
+      cancel_url: cancelUrl.toString(),
       metadata: {
         userId: user.id,
       },
