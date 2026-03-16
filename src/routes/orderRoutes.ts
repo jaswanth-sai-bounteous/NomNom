@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { checkout, getOrders, getOrderById } from "../controllers/orderController";
+import { checkout, clearOrders, getOrders, getOrderById } from "../controllers/orderController";
 import { authMiddleware } from "../middleware/authMiddleware";
 
 const orderRoutes = Router();
@@ -8,6 +8,7 @@ const orderRoutes = Router();
 orderRoutes.use(authMiddleware);
 
 orderRoutes.post("/checkout", checkout);
+orderRoutes.delete("/", clearOrders);
 orderRoutes.get("/", getOrders);
 orderRoutes.get("/:id", getOrderById);
 

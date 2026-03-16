@@ -14,6 +14,7 @@ export const checkout = async (req: Request, res: Response) => {
     const order = await orderService.checkout(
       user.id,
       shippingAddress,
+      
       paymentMethod,
     );
 
@@ -35,6 +36,22 @@ export const getOrders = async (req: Request, res: Response) => {
   try {
     const orders = await orderService.getOrders(user.id);
     res.json({ orders });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    res.status(400).json({ message });
+  }
+};
+
+export const clearOrders = async (req: Request, res: Response) => {
+  const { user } = req as AuthRequest;
+  if (!user) return res.status(401).json({ message: "Unauthorized" });
+
+  try {
+    await orderService.clearOrders(user.id);
+    res.json({
+      message: "Orders cleared successfully",
+      orders: [],
+    });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Unknown error";
     res.status(400).json({ message });

@@ -9,6 +9,7 @@ import {
   foodItems,
   orderItems,
   orders,
+  payments,
 } from "../db/schema";
 
 type OrderRow = typeof orders.$inferSelect;
@@ -145,6 +146,26 @@ export const getOrders = async (userId: string) => {
     .where(eq(orders.userId, userId));
 
   return attachItemsToOrders(userOrders);
+};
+
+/* Delete the current user's order history and related child records. */
+export const clearOrders = async (userId: string) => {
+  const userOrders = await db
+    .select({ id: orders.id })
+    .from(orders)
+    .where(eq(orders.userId, userId));
+
+  if (userOrders.length === 0) {
+    return [];
+  }
+
+  const orderIds = userOrders.map((order) => order.id);
+
+  await db.delete(payments).where(inArray(payments.orderId, orderIds));
+  await db.delete(orderItems).where(inArray(orderItems.orderId, orderIds));
+  await db.delete(orders).where(inArray(orders.id, orderIds));
+
+  return [];
 };
 
 /* Return one order only if both order id and user id match. */
