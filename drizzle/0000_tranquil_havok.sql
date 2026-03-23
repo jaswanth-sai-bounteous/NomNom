@@ -16,6 +16,7 @@ CREATE TABLE "cart_items" (
 	"total_price" numeric NOT NULL
 );
 --> statement-breakpoint
+
 CREATE TABLE "carts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" uuid NOT NULL,
